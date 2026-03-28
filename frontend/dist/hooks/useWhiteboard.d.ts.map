@@ -1,0 +1,1 @@
+{"version":3,"file":"useWhiteboard.d.ts","sourceRoot":"","sources":["../../src/hooks/useWhiteboard.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EACV,QAAQ,EACR,IAAI,EACJ,MAAM,EACN,cAAc,EACd,cAAc,EAGf,MAAM,mBAAmB,CAAC;AAgH3B,wBAAgB,aAAa;;wBAGY,MAAM;8BACA,MAAM;4BACR,MAAM;;0BAER,cAAc;wBAChB,MAAM;0BACJ,MAAM;oBACZ,cAAc;sBACZ,MAAM;4BACA,MAAM;gCACF,cAAc;6BACjB,QAAQ;;;;;;EAuBrD"}
