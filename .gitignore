@@ -1,1 +1,4 @@
-node_modules/\ndist/\nfrontend/dist/\nfrontend/node_modules/
+node_modules/
+dist/
+frontend/dist/
+frontend/node_modules/
