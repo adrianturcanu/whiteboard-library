@@ -106,6 +106,25 @@ function whiteboardReducer(state: WhiteboardState, action: WhiteboardAction): Wh
     }
     case 'LOAD_NOTEBOOK':
       return { ...state, notebook: action.notebook, currentPageIndex: 0 };
+    case 'IMPORT_PAGES': {
+      // Bring pages in from another (e.g. a previous lesson's) notebook. Clone
+      // with fresh page + stroke ids so they never collide with existing ids.
+      const cloned: Page[] = action.pages.map((p) => ({
+        ...p,
+        id: generateStrokeId(),
+        strokes: p.strokes.map((s) => ({ ...s, id: generateStrokeId() })),
+      }));
+      if (cloned.length === 0) return state;
+      const replace = action.mode === 'replace';
+      const pages = replace ? cloned : [...state.notebook.pages, ...cloned];
+      // Land on the first imported page so the teacher sees what they brought in.
+      const currentPageIndex = replace ? 0 : state.notebook.pages.length;
+      return {
+        ...state,
+        notebook: updateNotebookTimestamp({ ...state.notebook, pages }),
+        currentPageIndex,
+      };
+    }
     default:
       return state;
   }
@@ -134,6 +153,10 @@ export function useWhiteboard() {
   const setStrokeWidth = useCallback((width: number) => dispatch({ type: 'SET_WIDTH', width }), []);
   const setBackground = useCallback((background: PageBackground) => dispatch({ type: 'SET_BACKGROUND', background }), []);
   const loadNotebook = useCallback((notebook: Notebook) => dispatch({ type: 'LOAD_NOTEBOOK', notebook }), []);
+  const importPages = useCallback(
+    (pages: Page[], mode: 'append' | 'replace' = 'append') => dispatch({ type: 'IMPORT_PAGES', pages, mode }),
+    [],
+  );
 
   const currentPage = useMemo(
     () => state.notebook.pages[state.currentPageIndex],
@@ -155,5 +178,6 @@ export function useWhiteboard() {
     setStrokeWidth,
     setBackground,
     loadNotebook,
+    importPages,
   };
 }

@@ -41,12 +41,61 @@ export interface Page {
   strokes: Stroke[];
 }
 
+/**
+ * Weekly practice planner — a structured (non-freehand) note format filled in by
+ * teacher and student. A 7-day grid of practice assignments, a per-item practice
+ * tracker (items × Mon–Sun checkboxes with a per-day target), and a technique
+ * notes box. Serialized as JSON inside a Notebook (notebook.planner) so a single
+ * saved `.notebook` can be either freeform drawing OR a weekly planner.
+ */
+export const PLANNER_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
+
+export interface WeeklyPlannerDay {
+  /** One of PLANNER_DAYS. */
+  day: string;
+  /** The calendar date for that day, e.g. "Jun 22" (shown beside the day name). */
+  date?: string;
+  /** Free-text practice assignment(s) for that day. */
+  assignments: string;
+}
+
+export interface WeeklyPlannerTrackerItem {
+  id: string;
+  /** What to practise, e.g. "G major scale". */
+  label: string;
+  /** Optional per-day target, e.g. "5/day". */
+  target?: string;
+  /** Seven booleans, Mon..Sun, marking the days it was practised. */
+  days: boolean[];
+}
+
+export interface WeeklyPlannerData {
+  version: 1;
+  /** Free text for the week, e.g. "June 16–23". */
+  weekOf?: string;
+  /** Mon..Sun assignment cells (length 7). */
+  days: WeeklyPlannerDay[];
+  /** Practice tracker rows. */
+  tracker: { items: WeeklyPlannerTrackerItem[] };
+  /** Technique notes (e.g. LH/RH reminders). */
+  notes: string;
+  /** Section keys a student may edit in the portal (deferred; empty for now). */
+  editableByStudent?: string[];
+}
+
+/** The note format a lesson workspace uses. */
+export type NotebookMode = 'freeform' | 'weekly';
+
 export interface Notebook {
   version: number;
   title: string;
   pages: Page[];
   createdAt: string;
   updatedAt: string;
+  /** Which surface this notebook represents. Absent ⇒ 'freeform' (back-compat). */
+  mode?: NotebookMode;
+  /** Present when mode === 'weekly'. */
+  planner?: WeeklyPlannerData;
 }
 
 export interface WhiteboardState {
@@ -69,4 +118,5 @@ export type WhiteboardAction =
   | { type: 'SET_COLOR'; color: string }
   | { type: 'SET_WIDTH'; width: number }
   | { type: 'SET_BACKGROUND'; background: PageBackground }
-  | { type: 'LOAD_NOTEBOOK'; notebook: Notebook };
+  | { type: 'LOAD_NOTEBOOK'; notebook: Notebook }
+  | { type: 'IMPORT_PAGES'; pages: Page[]; mode?: 'append' | 'replace' };
